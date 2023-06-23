@@ -1,63 +1,90 @@
-const { hashSync, compareSync } = require("bcrypt");
-const Query = require("../models/Query");
+const { compareSync, hash } = require("bcrypt")
 
-const knex= require("../database/connection")
+const knex = require("../database/connection")
 
-const { v4: uidgen } = require("uuid");
+module.exports = {
+  async login(req, res) {
+    try {
+      const { email, password } = req.body
 
-exports.login = async (req, res) => {
-  try {
-  // knex("users")
-  //   .select("*")
-  //  
-  //   .where("id", ">", 20)
-  //   .andWhere("id", "<", 200)
-  //   .limit(10)
-  //   .offset(x)
-  //   .then(function (rows) {
-  //     return _.pluck(rows, "name")
-  //   })
-  //   .then(function (names) {
-  //     return knex.select("id").from("nicknames").whereIn("nickname", names)
-  //   })
-  //   .then(function (rows) {
-  //     console.log(rows)
-  //   })
-  //   .catch(function (error) {
-  //     console.error(error)
-  //   })
-    const findUser = await User.findOne({ username: req.body.username });
-    if (!findUser)
-      return res
-        .status(401)
-        .send({ success: false, message: "User doesn't exist" });
-    const passwordMatch = compareSync(req.body.password, findUser.password);
-    if (!passwordMatch)
-      return res
-        .status(401)
-        .send({ success: false, message: "Wrong password" });
-    findUser.password = undefined;
-    res.send(findUser);
-  } catch (err) {
-    res.status(400).send({ error: err.message });
-  }
-};
+      const findUser = await knex("users").select("*").where({ email }).first()
 
-exports.signup = async (req, res) => {
-  try {
-    const newQuery = new Query({ texts: [] });
-    const {_id } = await newQuery.save();
-    const newUser = new User({
-      uid: uidgen(),
-      ...req.body,
-      password: hashSync(req.body.password, 10),
-      apiKey: generateApiKey({ method: "bytes" }),
-      queries: _id,
-    });
-    const user = await newUser.save();
-    user.password = undefined;
-    res.status(201).send(user);
-  } catch (err) {
-    res.status(400).send({ success: false, message: err.message });
-  }
-};
+      if (!findUser)
+        return res
+          .status(401)
+          .send({ success: false, message: "User doesn't exist" })
+      const passwordMatch = compareSync(password, findUser.password)
+      if (!passwordMatch)
+        return res
+          .status(401)
+          .send({ success: false, message: "Wrong password" })
+      findUser.password = undefined
+      res.send(findUser)
+    } catch (err) {
+      res.status(400).send({ error: err.message })
+    }
+  },
+
+  async signup(req, res) {
+    try {
+      const { username, email } = req.body
+      const pass = req.body.password
+      const password = await hash(pass, 10)
+
+      const findUser = await knex("users").select("*").where({ email }).first()
+
+      if (findUser)
+        return res
+          .status(401)
+          .send({ success: false, message: "User already exists" })
+
+      const id = await knex("users").insert({
+        username,
+        email,
+        password,
+      })
+      const user = await knex("users").select("*").first()
+
+      user.password = undefined
+      res.status(201).send({ user })
+    } catch (err) {
+      res.status(400).send({ success: false, message: err.message })
+    }
+  },
+
+  async index(req, res) {
+    try {
+
+      const user = await knex("users").select("*")
+
+      if (!user)
+        return res
+          .status(401)
+          .send({ success: false, message: "Users no founded" })
+
+    
+
+
+      res.status(201).send({ user })
+    } catch (err) {
+      res.status(400).send({ success: false, message: err.message })
+    }
+  },
+
+  async auth(req, res) {
+    try {
+      const { id } = req.params
+
+      const findUser = await knex("users").del().where({ id })
+
+      if (!findUser)
+        return res
+          .status(401)
+          .send({ success: false, message: "fail to delete user" })
+
+      res.status(201)
+    } catch (err) {
+      res.status(400).send({ success: false, message: err.message })
+    }
+  },
+}

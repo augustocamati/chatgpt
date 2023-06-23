@@ -15,7 +15,6 @@ module.exports = {
     connection: {
       filename: "./src/database/bd.sqlite3",
     },
-    useNullAsDefault: true,
   },
 
   staging: {

@@ -1,43 +1,53 @@
-const Query = require("../models3/Query");
-const { createCompletionChatGTP } = require("../chatGTP");
-const { v4: uuid } = require("uuid");
+const { createCompletionChatGTP } = require("../../chatGPT")
+const knex = require("../database/connection")
 
-exports.chat = async (req, res) => {
-  try {
-    const tempId = uuid();
-    await Query.updateOne(
-      { _id: req.queryId },
-      { $push: { texts: { message: req.body.message, textBy: 1 } } }
-    );
-    const { data } = await createCompletionChatGTP({
-      message: req.body.message,
-    });
-    await Query.updateOne(
-      { _id: req.queryId },
-      {
-        $push: {
-          texts: { message: data.choices[0]?.text, textBy: 0 },
-        },
-      }
-    );
-    res.send({
-      message: data.choices[0]?.text,
-      _id: data.choices[0] ? tempId : undefined,
-    });
-  } catch (err) {
-    res.status(400).send({ success: false, message: err.message });
-  }
-};
+module.exports = {
+  async chat(req, res) {
+    try {
+      const user_id = req.params
+      const { content } = req.body
+      const role = "user"
 
-exports.getAllChats = async (req, res) => {
-  try {
-    const query = await Query.findOne({ _id: req.queryId });
-    if (!query)
-      return res
-        .status(400)
-        .send({ success: false, message: "Query doesn't exist" });
-    res.send(query);
-  } catch (err) {
-    res.status(400).send({ success: false, message: err.message });
-  }
-};
+      const user = knex("users").select("*").where(id, user_id).first()
+      if (!user)
+        return res
+          .status(400)
+          .send({ success: false, message: "User doesn't exist" })
+
+      knex("chats").insert({ user_id, content, role })
+
+      const { data } = await createCompletionChatGTP({
+        message: req.body.content,
+      })
+
+      const chats = knex("chats").insert({
+        user_id,
+        content: data.choices[0]?.text,
+        role: "chat",
+      })
+
+      res.send({
+        user,
+        chats,
+      })
+    } catch (err) {
+      res.status(400).send({ success: false, message: err.message })
+    }
+  },
+
+  async getAllChats(req, res) {
+    try {
+      const user_id = req.params.id
+      console.log("req.body", req.params.id)
+      const chats = await knex("chats").select("*").where({ user_id })
+   
+      if (!chats)
+        return res
+          .status(401)
+          .send({ success: false, message: "chats doesn't exist" })
+      res.send({ chats })
+    } catch (err) {
+      res.status(400).send({ success: false, message: err.message })
+    }
+  },
+}

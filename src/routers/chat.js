@@ -1,8 +1,8 @@
 const { chat, getAllChats } = require("../controllers/chat")
-const { checkApiKey } = require("../middlewares/apiKey")
+
 const router = require("express").Router()
 
-router.post("/chat/:apiKey", checkApiKey, chat)
-router.get("/getchats/:apiKey", checkApiKey, getAllChats)
+router.post("/chat/:id", chat)
+router.get("/getchats/:id", getAllChats)
 
 module.exports = router
