@@ -43,10 +43,10 @@ module.exports = {
         email,
         password,
       })
-      const user = await knex("users").select("*").first()
+      // const user = await knex("users").select("*").where({id}).first()
 
-      user.password = undefined
-      res.status(201).send({ user })
+     
+      res.status(201).send({ id })
     } catch (err) {
       res.status(400).send({ success: false, message: err.message })
     }
@@ -82,7 +82,7 @@ module.exports = {
           .status(401)
           .send({ success: false, message: "fail to delete user" })
 
-      res.status(201)
+      res.status(201).send({ success: true })
     } catch (err) {
       res.status(400).send({ success: false, message: err.message })
     }

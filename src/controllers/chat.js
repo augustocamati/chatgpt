@@ -4,17 +4,17 @@ const knex = require("../database/connection")
 module.exports = {
   async chat(req, res) {
     try {
-      const user_id = req.params
+      const user_id = req.params.id
       const { content } = req.body
       const role = "user"
 
-      const user = knex("users").select("*").where(id, user_id).first()
+      const user = await knex("users").select("*").where('id', user_id).first()
       if (!user)
         return res
           .status(400)
           .send({ success: false, message: "User doesn't exist" })
 
-      knex("chats").insert({ user_id, content, role })
+     await knex("chats").insert({ user_id, content, role })
 
       const { data } = await createCompletionChatGTP({
         message: req.body.content,
