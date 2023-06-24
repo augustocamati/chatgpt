@@ -20,15 +20,15 @@ module.exports = {
         message: req.body.content,
       })
 
-      const chats = knex("chats").insert({
+     await knex("chats").insert({
         user_id,
         content: data.choices[0]?.text,
         role: "chat",
       })
-
+const msg = data.choices[0]?.text
       res.send({
         user,
-        chats,
+        msg,
       })
     } catch (err) {
       res.status(400).send({ success: false, message: err.message })
