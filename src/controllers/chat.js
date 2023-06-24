@@ -8,7 +8,7 @@ module.exports = {
       const { content } = req.body
       const role = "user"
 
-      const user = await knex("users").select("*").where('id', user_id).first()
+      const user = await knex("users").select("id","username").where('id', user_id).first()
       if (!user)
         return res
           .status(400)
