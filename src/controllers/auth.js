@@ -55,9 +55,9 @@ module.exports = {
   async index(req, res) {
     try {
 
-      const user = await knex("users").select("*")
+      const user = await knex("users").select('id','username','email')
 
-      if (!user)
+      if (!user) 
         return res
           .status(401)
           .send({ success: false, message: "Users no founded" })

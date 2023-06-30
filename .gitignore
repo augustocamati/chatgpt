@@ -1,2 +1,5 @@
 .env
 /node_modules
+src/database/bd.sqlite3
+./src/database
+src/database/bd.sqlite3
