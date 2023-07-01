@@ -34,9 +34,9 @@ module.exports = {
       const password = await hash(pass, 10)
 
       const findUser = await knex("users").select("*").where({ email }).first()
-      console.log("findUser", findUser)
+    
       if (findUser) {
-        console.log("exists", findUser)
+     
         return res
           .status(401)
           .send({ success: false, message: "User already exists" })

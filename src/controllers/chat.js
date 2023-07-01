@@ -38,7 +38,7 @@ const msg = data.choices[0]?.text
   async getAllChats(req, res) {
     try {
       const user_id = req.params.id
-      console.log("req.body", req.params.id)
+     
       const chats = await knex("chats").select("*").where({ user_id })
    
       if (!chats)
