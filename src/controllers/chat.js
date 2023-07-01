@@ -17,7 +17,7 @@ module.exports = {
      await knex("chats").insert({ user_id, content, role })
 
       const { data } = await createCompletionChatGTP({
-        message: req.body.content,
+        message: req.body.content, 
       })
 
      await knex("chats").insert({
