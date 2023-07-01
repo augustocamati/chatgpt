@@ -7,10 +7,10 @@ const chatRouter = require("./src/routers/chat")
 
 const app = express()
 
+app.use(cors())
 app.use(express.json()) 
 app.use(authRouter)
 app.use(chatRouter)
-app.use(cors())
 
 // app.use("/auth", authRouter);
 // app.use("/chatgpt", chatRouter);
