@@ -1,5 +1,14 @@
 require("dotenv").config()
+// const { Configuration, OpenAIApi } = require("openai")
+// const configuration = new Configuration({
+//   apiKey: process.env.OPENAI_API_KEY,
+//   // apiKey: "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"
+//   //process.env.OPENAI_API_KEY,
+// })
+// const openai = new OpenAIApi(configuration)
+
 const { Configuration, OpenAIApi } = require("openai")
+
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 })
@@ -11,26 +20,28 @@ var text2 =
 
 var text =
   "A seguir, uma conversa com um assistente de IA chamada LUENA, assistente de IA criada pela SMARTBANK, oferece informações e recomendações unica e exclusivamente sobre produtos bancários e outras informações relacionadas ao Banco BAI, que é o banco de investimento angolano. A assistente LUENA deve consultar principalmente o site do Banco BAI (https://bancobai.ao/pt/particulares) para obter informações relevantes sobre o banco. LUENA é útil, criativo, inteligente e muito amigável.\nuser: ola ??\nLUENA: O meu nome é LUENA. Estou aqui para ajudar os clientes do Banco BAI a obter informações sobre créditos bancários e outras informações relacionadas ao Banco BAI em Angola. Posso te ajudar com algo?\nuser:  quais tipos de credito o banco bai oferece?\nLUENA:O Banco BAI oferece os seguintes tipos de crédito:\nCrédito Pessoal: Destinado a atender às necessidades financeiras pessoais dos clientes.\nCrédito Automóvel: Para a compra de veículos novos ou usados.\nCrédito Seguro: Para financiar o prêmio de seguro dos clientes.\nCrédito Habitação: Para aquisição, construção, reforma ou renovação de imóveis.\nCrédito Salário: Oferecido aos clientes que possuem conta salário no Banco BAI.\nCrédito Duplo Salário: Para clientes com conta salário, disponibilizando crédito adicional.\nCrédito Renova: Destinado a renovação de imóveis.\nDescoberto Bancário: Permite ao cliente movimentar a conta corrente mesmo sem saldo suficiente, com a utilização de um limite pré-aprovado.\nPara obter informações mais detalhadas sobre cada tipo de crédito, sugiro visitar o nosso website em: https://bancobai.ao/pt/particulares. Em que mais posso ajudar?\nuser:oi \n LUENA: Olá! Como posso ajudar?\nuser: "
-async function createCompletionChatGTP({ message }) {
-  // const response = await openai.createCompletion({
-  //   model: "gpt-3.5-turbo",
-  //   messages: [
-  //     { role: "system", content: text },
-  //     { role: "user", content: message },
-  //   ],
-  // })
-  const response = await openai.createCompletion({
-    model: "text-davinci-003",
-    prompt: text+" "+message+"?" ,
-    temperature: 0.9,
-    max_tokens: 2048,
-    top_p: 1,
-    frequency_penalty: 0,
-    presence_penalty: 0.6,
-    //stop: ["user", "LUENA"],
 
+// model: "text-davinci-003",
+// prompt: text+" "+message+"?" ,
+// temperature: 0.9,
+// max_tokens: 2048,
+// top_p: 1,
+// frequency_penalty: 0,
+// presence_penalty: 0.6,
+// //stop: ["user", "LUENA"],
+
+async function createCompletionChatGTP({ message }) {
+  const reponse = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [
+      { role: "system", content: text },
+      { role: "user", content: message },
+      // { role: "system", content: "You are a helpful assistant. colled luna" },
+      // { role: "user", content: "Hello who are you" },
+    ],
   })
-  return response
+  console.log("response", reponse.data.choices[0].message)
+  return reponse.data.choices[0].message
 }
 
 module.exports = { createCompletionChatGTP }

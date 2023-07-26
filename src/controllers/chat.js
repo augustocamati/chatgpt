@@ -5,8 +5,8 @@ module.exports = {
   async chat(req, res) {
     try {
       const user_id = req.params.id
-      const { content } = req.body
-      const role = "user"
+      const UserContent = req.body.content
+      const UserRole = "user"
 
       const user = await knex("users").select("id","username").where('id', user_id).first()
       if (!user)
@@ -14,22 +14,27 @@ module.exports = {
           .status(400)
           .send({ success: false, message: "User doesn't exist" })
 
-     await knex("chats").insert({ user_id, content, role })
+     await knex("chats").insert({
+       user_id,
+       content: UserContent,
+       role: UserRole,
+     })
 
-      const { data } = await createCompletionChatGTP({
+      const  {content,role}  = await createCompletionChatGTP({
         message: req.body.content, 
       })
-
+ console.log("chat:", content,
+        role)
      await knex("chats").insert({
-        user_id,
-        content: data.choices[0]?.text,
-        role: "chat",
-      })
-const msg = data.choices[0]?.text
-      res.send({
-        user,
-        msg,
-      })
+       user_id,
+       content: content,
+       role: role,
+     })
+
+     res.send({
+       user: role,
+       msg: content,
+     })
     } catch (err) {
       res.status(400).send({ success: false, message: err.message })
     }
