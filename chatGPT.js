@@ -34,7 +34,7 @@ async function createCompletionChatGTP({ message }) {
   const reponse = await openai.createChatCompletion({
     model: "gpt-3.5-turbo",
     messages: [
-      { role: "system", content: text },
+      { role: "system", content: text2 },
       { role: "user", content: message },
       // { role: "system", content: "You are a helpful assistant. colled luna" },
       // { role: "user", content: "Hello who are you" },
