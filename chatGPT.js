@@ -40,7 +40,7 @@ async function createCompletionChatGTP({ message }) {
       // { role: "user", content: "Hello who are you" },
     ],
   })
-  console.log("response", reponse.data.choices[0].message)
+  //console.log("response", reponse.data.choices[0].message)
   return reponse.data.choices[0].message
 }
 
